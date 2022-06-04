@@ -22,7 +22,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./docker/prometheus:/etc/prometheus/prometheus.yml
+      - ./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     ports:
       - "9090:9090"
@@ -42,10 +42,8 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
-    volumes:
-      - ./docker/ecommerce_api:ecommerce_api
     ports:
-      - '8080:8080'
+      - "8080:8080"
     depends_on:
       - mongodb
       - product_api
@@ -56,11 +54,9 @@ services:
   product_api:
     build:
       context: ./product-api
-      dockerfile: ./Dockerfile
-    volumes:
-      - ./docker/product_api:product_api
+      dockerfile: Dockerfile
     ports:
-      - '8081:8081'
+      - "5050:5050"
     depends_on:
       - mongodb
     networks:
@@ -69,11 +65,9 @@ services:
   users_api:
     build:
       context: ./users-api
-      dockerfile: ./Dockerfile
-    volumes:
-      - ./docker/users_api:users_api
+      dockerfile: Dockerfile
     ports:
-      - '8082:8082'
+      - "4000:4000"
     depends_on:
       - mongodb
     networks:
