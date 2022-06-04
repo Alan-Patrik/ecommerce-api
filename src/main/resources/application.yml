@@ -1,0 +1,57 @@
+server:
+  port: 8080
+
+spring:
+  data:
+    mongodb:
+      database: eccomerceDB
+    host: localhost
+    port: 27017
+    uri: mongodb://localhost:27017/eccomerceDB
+
+springdoc:
+  api-docs:
+    groups:
+      enabled: true
+  swagger-ui:
+    path: /docs
+    tags-sorter: method
+    operations-sorter: alpha
+  use-fqn: true
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    enabled-by-defaults: false
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+
+
+resilience4j.circuitbreaker:
+  instances:
+    product-service:
+      registerHealthIndicator: true
+      eventConsumerBufferSize: 10
+      failureRateThreshold: 50
+      minimumNumberOfCalls: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 5s
+      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowSize: 10
+      slidingWindowType: COUNT_BASED
+
+
+  retry:
+    instances:
+      product-service:
+        maxRetryAttempts: 5
+        waitDuration: 10s

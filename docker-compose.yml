@@ -1,0 +1,41 @@
+version: '3.8'
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  mongodata:
+
+services:
+  mongodb:
+    image: mongo
+    volumes:
+      - mongodata:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - my-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - my-network
+    ports:
+      - "9090:9090"
+
+  gafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - my-network
+
+
+
+
