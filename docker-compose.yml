@@ -22,7 +22,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker/prometheus:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     networks:
       - my-network
@@ -30,12 +30,61 @@ services:
       - "9090:9090"
 
   gafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:8.2.2
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+    links:
+      - prometheus
     ports:
       - "3000:3000"
     networks:
       - my-network
 
+  ecommerce_api:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./docker/ecommerce_api:ecommerce_api
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mongodb
+      - prometheus
+      - grafana
+      - product_api
+      - users_api
+    networks:
+      - my-network
 
+  product_api:
+    build:
+      context: ./product-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./docker/product_api:product_api
+    ports:
+      - '8081:8081'
+    depends_on:
+      - mongodb
+      - prometheus
+      - grafana
+    networks:
+      - my-network
 
+  users_api:
+    build:
+      context: ./users-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./docker/users_api:users_api
+    ports:
+      - '8082:8082'
+    depends_on:
+      - mongodb
+      - prometheus
+      - grafana
+    networks:
+      - my-network
 
