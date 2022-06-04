@@ -17,7 +17,7 @@ public class PurchaseValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Purchase purchase = (Purchase) target;
 
-        if (purchase.getUserId() <= 0) {
+        if (purchase.getUser() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'USER-ID' field is required!");
         }
 

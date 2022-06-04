@@ -4,7 +4,9 @@ import com.alanpatrik.ecommerce_api.modules.cart.Cart;
 import com.alanpatrik.ecommerce_api.modules.cart.CartRepository;
 import com.alanpatrik.ecommerce_api.modules.product.Product;
 import com.alanpatrik.ecommerce_api.modules.product.ProductService;
-import com.alanpatrik.ecommerce_api.modules.product.dto.ProductDTO;
+import com.alanpatrik.ecommerce_api.modules.user.User;
+import com.alanpatrik.ecommerce_api.modules.user.UserService;
+import com.alanpatrik.ecommerce_api.modules.user.dto.UserPurchaseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ public class PurchaseService {
     private final PurchaseRepository repository;
     private final ProductService productService;
     private final CartRepository cartRepository;
+    private final UserService userService;
 
     public Flux<Purchase> getAll() {
         return repository.findAll();
@@ -31,17 +34,31 @@ public class PurchaseService {
 
     public Mono<Purchase> create(Mono<Purchase> purchase) {
         return purchase
-                .doOnNext(item -> {
+                .flatMap(item -> {
+                    if (!item.getCart().getUserId().equals(item.getUser().getId())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error.. Esse id %s não pertence a você!");
+                    }
+                    UserPurchaseDTO userPurchaseDTO = new UserPurchaseDTO();
+                    Mono<User> user = userService.getById(item.getUser().getId());
+                    user.doOnNext(u -> {
+                        userPurchaseDTO.setId(u.getId());
+                        userPurchaseDTO.setName(u.getName());
+                        item.setUser(userPurchaseDTO);
+                        log.info("[INFO]: Showing user [ {} ]", u);
+                    });
+
                     item.getCart().getProducts().stream()
                             .map(product -> productService.updateStorage(product.getId(), product))
                             .collect(Collectors.toList());
 
                     item.setTotal(totalPrice(item.getCart().getProducts()));
                     item.setItemsCart(item.getCart().getProducts().size());
+
+                    return Mono.just(item);
                 })
                 .flatMap(repository::save)
                 .doOnNext(c -> log.info("[INFO]: Deleting cart [ {} ]", c.getCart()))
-                .doOnNext(item -> cartRepository.save(new Cart()))
+                .flatMap(item -> cartRepository.delete(item.getCart()))
                 .cast(Purchase.class);
     }
 

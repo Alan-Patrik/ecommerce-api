@@ -1,6 +1,7 @@
 package com.alanpatrik.ecommerce_api.modules.cart;
 
 import com.alanpatrik.ecommerce_api.modules.product.Product;
+import com.alanpatrik.ecommerce_api.modules.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,6 @@ public class Cart {
 
     @Id
     private String id;
+    private String userId;
     private List<Product> products = new ArrayList<>();
 }

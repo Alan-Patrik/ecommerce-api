@@ -1,6 +1,7 @@
 package com.alanpatrik.ecommerce_api.modules.purchase;
 
 import com.alanpatrik.ecommerce_api.modules.cart.Cart;
+import com.alanpatrik.ecommerce_api.modules.user.dto.UserPurchaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ public class Purchase {
 
     @Id
     private String id;
-    private int userId;
+    private UserPurchaseDTO user;
     private Cart cart;
     private double total;
     private int itemsCart;

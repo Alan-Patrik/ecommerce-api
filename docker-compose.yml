@@ -24,18 +24,15 @@ services:
     volumes:
       - ./docker/prometheus:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-    networks:
-      - my-network
     ports:
       - "9090:9090"
+    networks:
+      - my-network
 
   gafana:
-    image: grafana/grafana:8.2.2
+    image: grafana/grafana:latest
     volumes:
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - grafana-data:/var/lib/grafana
-    links:
-      - prometheus
+      - ./docker/grafana-data:/var/lib/grafana
     ports:
       - "3000:3000"
     networks:
@@ -51,8 +48,6 @@ services:
       - '8080:8080'
     depends_on:
       - mongodb
-      - prometheus
-      - grafana
       - product_api
       - users_api
     networks:
@@ -61,30 +56,26 @@ services:
   product_api:
     build:
       context: ./product-api
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
       - ./docker/product_api:product_api
     ports:
       - '8081:8081'
     depends_on:
       - mongodb
-      - prometheus
-      - grafana
     networks:
       - my-network
 
   users_api:
     build:
       context: ./users-api
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
       - ./docker/users_api:users_api
     ports:
       - '8082:8082'
     depends_on:
       - mongodb
-      - prometheus
-      - grafana
     networks:
       - my-network
 
