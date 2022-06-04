@@ -1,0 +1,6 @@
+[submodule "product-api"]
+	path = product-api
+	url = https://github.com/Alan-Patrik/product-api.git
+[submodule "users-api"]
+	path = users-api
+	url = https://github.com/Alan-Patrik/users-api.git
