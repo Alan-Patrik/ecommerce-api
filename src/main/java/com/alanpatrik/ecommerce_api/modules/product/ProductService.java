@@ -11,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class ProductService {
@@ -88,12 +90,12 @@ public class ProductService {
                 .bodyToMono(Product.class);
     }
 
-    public Mono<Product> updateStorage(String id, Product product) {
-        log.info("[INFO]: Updating product stock [ {} ]", product);
+    public Mono<Product> updateStorage(String id, List<Product> products) {
+        log.info("[INFO]: Updating product stock [ {} ]", products);
         return webClient
                 .patch()
                 .uri("/products/update/storage/" + id)
-                .bodyValue(product)
+                .bodyValue(products)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError,

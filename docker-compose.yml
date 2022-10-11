@@ -41,7 +41,7 @@ services:
   ecommerce_api:
     build:
       context: ./
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     depends_on:
@@ -56,7 +56,7 @@ services:
       context: ./product-api
       dockerfile: Dockerfile
     ports:
-      - "5050:5050"
+      - "8081:8081"
     depends_on:
       - mongodb
     networks:
@@ -67,7 +67,7 @@ services:
       context: ./users-api
       dockerfile: Dockerfile
     ports:
-      - "4000:4000"
+      - "8082:8082"
     depends_on:
       - mongodb
     networks:
